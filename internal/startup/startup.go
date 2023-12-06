@@ -2,13 +2,15 @@ package startup
 
 import (
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
-	contracts_config "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/contracts/config"
-	services_handlers_healthz "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/services/handlers/healthz"
-	services_handlers_swagger "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/services/handlers/swagger"
-	services_probe_database "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/services/probes/database"
 	fluffycore_contracts_runtime "github.com/fluffy-bunny/fluffycore/contracts/runtime"
 	contracts_startup "github.com/fluffy-bunny/fluffycore/echo/contracts/startup"
 	services_startup "github.com/fluffy-bunny/fluffycore/echo/services/startup"
+	contracts_config "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/config"
+	services_handlers_discovery "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/discovery"
+	services_handlers_healthz "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/healthz"
+
+	services_handlers_swagger "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/swagger"
+	services_probe_database "github.com/fluffy-bunny/oidc-orchestrator/internal/services/probes/database"
 	echo "github.com/labstack/echo/v4"
 	log "github.com/rs/zerolog/log"
 )
@@ -51,6 +53,7 @@ func (s *startup) ConfigureServices(builder di.ContainerBuilder) error {
 	})
 	services_probe_database.AddSingletonIProbe(builder)
 	s.addAppHandlers(builder)
+	di.AddInstance[*contracts_config.Config](builder,s.config)
 	return nil
 }
 
@@ -70,4 +73,5 @@ func (s *startup) addAppHandlers(builder di.ContainerBuilder) {
 	// add your handlers here
 	services_handlers_healthz.AddScopedIHandler(builder)
 	services_handlers_swagger.AddScopedIHandler(builder)
+	services_handlers_discovery.AddScopedIHandler(builder)
 }
