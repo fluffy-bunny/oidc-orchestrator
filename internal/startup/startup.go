@@ -10,6 +10,7 @@ import (
 	services_handlers_authorize "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/authorize"
 	services_handlers_discovery "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/discovery"
 	services_handlers_healthz "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/healthz"
+	services_handlers_home "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/home"
 	services_handlers_jwks "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/jwks"
 	services_handlers_signingoogle "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/signingoogle"
 	services_handlers_swagger "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/swagger"
@@ -76,6 +77,7 @@ func (s *startup) PreShutdownHook(echo *echo.Echo) error {
 }
 func (s *startup) addAppHandlers(builder di.ContainerBuilder) {
 	// add your handlers here
+	services_handlers_home.AddScopedIHandler(builder)
 	services_handlers_healthz.AddScopedIHandler(builder)
 	services_handlers_swagger.AddScopedIHandler(builder)
 	services_handlers_discovery.AddScopedIHandler(builder)
