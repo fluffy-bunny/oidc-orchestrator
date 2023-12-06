@@ -16,9 +16,9 @@ var version = "Development"
 
 // https://github.com/swaggo/echo-swagger
 
-// @title Swagger Example API
+// @title OIDC Orchestrator API
 // @version 1.0
-// @description This is a sample server Petstore server.
+// @description Orchestrates a login to a downstream IDP.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support

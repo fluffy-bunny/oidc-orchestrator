@@ -6,7 +6,7 @@ const (
 	HealthzPath       = "/healthz"
 	ReadyPath         = "/ready"
 	DiscoveryPath     = "/.well-known/openid-configuration"
-	JWKSPath          = "/.well-known/jwks.json"
+	JWKSPath          = "/.well-known/jwks"
 	TokenPath         = "/token"
 	AuthorizationPath = "/authorization"
 )

@@ -15,7 +15,6 @@ type (
 	service struct {
 		config            *contracts_config.Config
 		downstreamService contracts_downstream.IDownstreamOIDCService
-		discoveryDocument *contracts_downstream.DiscoveryDocument
 	}
 )
 
@@ -30,18 +29,13 @@ func AddScopedIHandler(builder di.ContainerBuilder) {
 		[]contracts_handler.HTTPVERB{
 			contracts_handler.GET,
 		},
-		wellknown.DiscoveryPath,
+		wellknown.JWKSPath,
 	)
 
 }
 func ctor(config *contracts_config.Config, downstreamService contracts_downstream.IDownstreamOIDCService) (*service, error) {
-	discoveryDocument, err := downstreamService.GetDiscoveryDocument()
-	if err != nil {
-		return nil, err
-	}
 	return &service{
 		config:            config,
-		discoveryDocument: discoveryDocument,
 		downstreamService: downstreamService,
 	}, nil
 }
@@ -55,14 +49,12 @@ func (s *service) GetMiddleware() []echo.MiddlewareFunc {
 // @Tags root
 // @Accept */*
 // @Produce json
-// @Success 200 {object} contracts_downstream.DiscoveryDocument
-// @Router /.well-known/openid-configuration [get]
+// @Success 200 {object} interface{}
+// @Router /.well-known/jwks [get]
 func (s *service) Do(c echo.Context) error {
-	baseUrl := "http://" + c.Request().Host
-
-	s.discoveryDocument.JwksURI = baseUrl + wellknown.JWKSPath
-	s.discoveryDocument.AuthorizationEndpoint = baseUrl + wellknown.AuthorizationPath
-	s.discoveryDocument.TokenEndpoint = baseUrl + wellknown.TokenPath
-
-	return c.JSON(http.StatusOK, s.discoveryDocument)
+	certs, err := s.downstreamService.GetJWKS()
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, certs)
 }
