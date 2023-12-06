@@ -9,4 +9,5 @@ const (
 	JWKSPath          = "/.well-known/jwks"
 	TokenPath         = "/token"
 	AuthorizationPath = "/authorization"
+	SigninGooglePath = "/signin-google"
 )

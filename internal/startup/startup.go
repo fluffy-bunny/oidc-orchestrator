@@ -7,11 +7,13 @@ import (
 	services_startup "github.com/fluffy-bunny/fluffycore/echo/services/startup"
 	contracts_config "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/config"
 	services_downstream "github.com/fluffy-bunny/oidc-orchestrator/internal/services/downstream"
+	services_handlers_authorize "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/authorize"
 	services_handlers_discovery "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/discovery"
 	services_handlers_healthz "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/healthz"
 	services_handlers_jwks "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/jwks"
-
+	services_handlers_signingoogle "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/signingoogle"
 	services_handlers_swagger "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/swagger"
+	services_handlers_token "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/token"
 	services_probe_database "github.com/fluffy-bunny/oidc-orchestrator/internal/services/probes/database"
 	echo "github.com/labstack/echo/v4"
 	log "github.com/rs/zerolog/log"
@@ -78,4 +80,7 @@ func (s *startup) addAppHandlers(builder di.ContainerBuilder) {
 	services_handlers_swagger.AddScopedIHandler(builder)
 	services_handlers_discovery.AddScopedIHandler(builder)
 	services_handlers_jwks.AddScopedIHandler(builder)
+	services_handlers_authorize.AddScopedIHandler(builder)
+	services_handlers_token.AddScopedIHandler(builder)
+	services_handlers_signingoogle.AddScopedIHandler(builder)
 }
