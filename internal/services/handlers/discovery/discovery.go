@@ -61,8 +61,8 @@ func (s *service) Do(c echo.Context) error {
 	baseUrl := "http://" + c.Request().Host
 
 	s.discoveryDocument.JwksURI = baseUrl + wellknown.JWKSPath
-	s.discoveryDocument.AuthorizationEndpoint = baseUrl + wellknown.AuthorizationPath
+	//s.discoveryDocument.AuthorizationEndpoint = baseUrl + wellknown.AuthorizationPath
 	s.discoveryDocument.TokenEndpoint = baseUrl + wellknown.TokenPath
-
+	s.discoveryDocument.Issuer = baseUrl
 	return c.JSON(http.StatusOK, s.discoveryDocument)
 }

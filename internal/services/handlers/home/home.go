@@ -52,5 +52,5 @@ func (s *service) GetMiddleware() []echo.MiddlewareFunc {
 // @Router /authorization [get]
 func (s *service) Do(c echo.Context) error {
 	// redirect temporarily to swagger
-	return c.Redirect(http.StatusTemporaryRedirect, "/swagger/")
+	return c.Redirect(http.StatusFound, "/swagger/")
 }

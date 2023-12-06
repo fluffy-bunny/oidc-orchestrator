@@ -25,7 +25,7 @@ var (
 	"LOG_LEVEL": "info",
 	"PORT": 1111,
 	"DOWN_STREAM_AUTHORITY": "https://accounts.google.com",
-	"AUTHORIZED_REDIRECT_URL": "http://localhost:2222/signin-google"
+ 	"AUTHORIZED_REDIRECT_URL": "http://localhost:2222/signin-google"
 }
 `)
 )

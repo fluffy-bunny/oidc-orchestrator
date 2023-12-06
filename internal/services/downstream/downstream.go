@@ -88,3 +88,39 @@ func (s *service) GetJWKS() (interface{}, error) {
 	}
 	return jwks, nil
 }
+func (s *service) ExchangeCodeForToken(authToken string, code string, redirectURL string) (interface{}, error) {
+	// grant_type: authorization_code
+	client := resty.New()
+
+	// build a form to post
+	form := map[string]string{
+		"grant_type":   "authorization_code",
+		"code":         code,
+		"redirect_uri": redirectURL,
+	}
+	resp, err := client.R().
+		SetHeader("Authorization", authToken).
+		SetHeader("Content-Type", "application/x-www-form-urlencoded").
+		SetHeader("Accept", "application/json").
+		SetHeader("User-Agent", "Go-http-client/1.1").
+		SetFormData(form).
+		Post(s.discoveryDocument.TokenEndpoint)
+	if err != nil {
+		log.Error().Err(err).Msgf("ExchangeCodeForToken: %s", s.discoveryDocument.TokenEndpoint)
+		return nil, err
+	}
+	if resp.StatusCode() != http.StatusOK {
+		log.Error().Err(err).Msgf("ExchangeCodeForToken: %s", s.discoveryDocument.TokenEndpoint)
+		return nil, err
+	}
+	body := resp.Body()
+	log.Info().Msgf("ExchangeCodeForToken: %s", body)
+	var token interface{}
+	err = json.Unmarshal(body, &token)
+	if err != nil {
+		log.Error().Err(err).Msgf("ExchangeCodeForToken: %s", s.discoveryDocument.TokenEndpoint)
+		return nil, err
+	}
+	return token, nil
+
+}

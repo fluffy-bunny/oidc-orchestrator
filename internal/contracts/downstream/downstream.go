@@ -22,5 +22,6 @@ type (
 		// GetDiscoveryDocument ...
 		GetDiscoveryDocument() (*DiscoveryDocument, error)
 		GetJWKS() (interface{}, error)
+		ExchangeCodeForToken(basicAuth string,code string, redirectURL string) (interface{}, error)
 	}
 )
