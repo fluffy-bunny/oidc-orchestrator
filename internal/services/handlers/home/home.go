@@ -42,14 +42,6 @@ func (s *service) GetMiddleware() []echo.MiddlewareFunc {
 	return []echo.MiddlewareFunc{}
 }
 
-// HealthCheck godoc
-// @Summary Show the status of server.
-// @Description get the status of server.
-// @Tags root
-// @Accept */*
-// @Produce json
-// @Success 200 {object} interface{}
-// @Router /authorization [get]
 func (s *service) Do(c echo.Context) error {
 	// redirect temporarily to swagger
 	return c.Redirect(http.StatusFound, "/swagger/")
