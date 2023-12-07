@@ -1,6 +1,8 @@
 package token
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -57,6 +59,7 @@ func (s *service) GetMiddleware() []echo.MiddlewareFunc {
 // @Router /token [get]
 func (s *service) Do(c echo.Context) error {
 	log := zerolog.Ctx(c.Request().Context()).With().Logger()
+	fmt.Println("---------------->TOKEN Do")
 	r := c.Request()
 	type (
 		MyRequest struct {
@@ -98,8 +101,9 @@ func (s *service) handleAuthorizationCodeRequest(c echo.Context) error {
 
 	// pull the basic auth from the header
 	basicAuth := r.Header.Get("Authorization")
+	log.Info().Msgf("calling ExchangeCodeForToken")
 
-	response, err := s.downstreamService.ExchangeCodeForToken(ctx, basicAuth, code, redirectURI)
+	response, err := s.downstreamService.ExchangeCodeForToken(context.Background(), basicAuth, code, redirectURI)
 	if err != nil {
 		log.Error().Err(err).Msg("ExchangeCodeForToken")
 		return c.JSON(http.StatusBadRequest, "could not exchange code for token")

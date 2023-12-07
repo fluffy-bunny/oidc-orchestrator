@@ -25,13 +25,12 @@ definitions:
       issuer:
         type: string
       jwks_uri:
+        description: RevocationEndpoint                string   `json:"revocation_endpoint"`
         type: string
       response_types_supported:
         items:
           type: string
         type: array
-      revocation_endpoint:
-        type: string
       scopes_supported:
         items:
           type: string

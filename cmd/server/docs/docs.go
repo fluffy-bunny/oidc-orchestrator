@@ -178,6 +178,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "jwks_uri": {
+                    "description": "RevocationEndpoint                string   ` + "`" + `json:\"revocation_endpoint\"` + "`" + `",
                     "type": "string"
                 },
                 "response_types_supported": {
@@ -185,9 +186,6 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
-                },
-                "revocation_endpoint": {
-                    "type": "string"
                 },
                 "scopes_supported": {
                     "type": "array",
