@@ -22,20 +22,11 @@
         "args": [   ]        
     },
     {
-        "name": "clientapp",
-        "type": "go",
-        "request": "launch",
-        "mode": "auto",
-        "program": "${workspaceFolder}/cmd/clientapp",
-        
-        "args": [   ]        
-    },
-    {
         "name": "clientapp-google",
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceFolder}/cmd/clientapp2",
+        "program": "${workspaceFolder}/cmd/clientapp",
         "env": {
             "PORT": "5556",
             "GOOGLE_OAUTH2_CLIENT_ID": "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
@@ -49,7 +40,7 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceFolder}/cmd/clientapp2",
+        "program": "${workspaceFolder}/cmd/clientapp",
         "env": {
             "PORT": "5556",
             "GOOGLE_OAUTH2_CLIENT_ID": "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
