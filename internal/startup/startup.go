@@ -15,6 +15,7 @@ import (
 	services_handlers_signingoogle "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/signingoogle"
 	services_handlers_swagger "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/swagger"
 	services_handlers_token "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/token"
+	services_handlers_userinfo "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/userinfo"
 	services_probe_database "github.com/fluffy-bunny/oidc-orchestrator/internal/services/probes/database"
 	echo "github.com/labstack/echo/v4"
 	log "github.com/rs/zerolog/log"
@@ -85,4 +86,5 @@ func (s *startup) addAppHandlers(builder di.ContainerBuilder) {
 	services_handlers_authorize.AddScopedIHandler(builder)
 	services_handlers_token.AddScopedIHandler(builder)
 	services_handlers_signingoogle.AddScopedIHandler(builder)
+	services_handlers_userinfo.AddScopedIHandler(builder)
 }

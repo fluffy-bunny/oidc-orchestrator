@@ -88,7 +88,7 @@ func (s *service) GetJWKS() (interface{}, error) {
 	}
 	return jwks, nil
 }
-func (s *service) ExchangeCodeForToken(authToken string, code string, redirectURL string) (interface{}, error) {
+func (s *service) ExchangeCodeForToken(authToken string, code string, redirectURL string) (*contracts_downstream.AuthorizationCodeResponse, error) {
 	// grant_type: authorization_code
 	client := resty.New()
 
@@ -115,12 +115,12 @@ func (s *service) ExchangeCodeForToken(authToken string, code string, redirectUR
 	}
 	body := resp.Body()
 	log.Info().Msgf("ExchangeCodeForToken: %s", body)
-	var token interface{}
-	err = json.Unmarshal(body, &token)
+	response := &contracts_downstream.AuthorizationCodeResponse{}
+	err = json.Unmarshal(body, response)
 	if err != nil {
 		log.Error().Err(err).Msgf("ExchangeCodeForToken: %s", s.discoveryDocument.TokenEndpoint)
 		return nil, err
 	}
-	return token, nil
+	return response, nil
 
 }

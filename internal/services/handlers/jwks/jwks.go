@@ -5,6 +5,7 @@ import (
 
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
 	contracts_handler "github.com/fluffy-bunny/fluffycore/echo/contracts/handler"
+	mocks_oauth2 "github.com/fluffy-bunny/fluffycore/mocks/oauth2"
 	contracts_config "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/config"
 	contracts_downstream "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/downstream"
 	wellknown "github.com/fluffy-bunny/oidc-orchestrator/internal/wellknown"
@@ -18,8 +19,17 @@ type (
 	}
 )
 
+var signingKey *mocks_oauth2.SigningKey
+var jwksKeys *mocks_oauth2.JWKSKeys
+
 func init() {
 	var _ contracts_handler.IHandler = (*service)(nil)
+	signingKey, _ = mocks_oauth2.LoadSigningKey()
+	jwksKeys = &mocks_oauth2.JWKSKeys{
+		Keys: []mocks_oauth2.PublicJwk{
+			signingKey.PublicJwk,
+		},
+	}
 }
 
 // AddScopedIHandler registers the *service as a singleton.
@@ -52,9 +62,5 @@ func (s *service) GetMiddleware() []echo.MiddlewareFunc {
 // @Success 200 {object} interface{}
 // @Router /.well-known/jwks [get]
 func (s *service) Do(c echo.Context) error {
-	certs, err := s.downstreamService.GetJWKS()
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, certs)
+	return c.JSON(http.StatusOK, jwksKeys)
 }

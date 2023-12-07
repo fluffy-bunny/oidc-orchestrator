@@ -18,10 +18,17 @@ type (
 		CodeChallengeMethodsSupported     []string `json:"code_challenge_methods_supported"`
 		GrantTypesSupported               []string `json:"grant_types_supported"`
 	}
+	AuthorizationCodeResponse struct {
+		AccessToken string `json:"access_token"`
+		ExpiresIn   int    `json:"expires_in"`
+		IDToken     string `json:"id_token"`
+		Scope       string `json:"scope"`
+		TokenType   string `json:"token_type"`
+	}
 	IDownstreamOIDCService interface {
 		// GetDiscoveryDocument ...
 		GetDiscoveryDocument() (*DiscoveryDocument, error)
 		GetJWKS() (interface{}, error)
-		ExchangeCodeForToken(basicAuth string,code string, redirectURL string) (interface{}, error)
+		ExchangeCodeForToken(basicAuth string, code string, redirectURL string) (*AuthorizationCodeResponse, error)
 	}
 )

@@ -64,5 +64,9 @@ func (s *service) Do(c echo.Context) error {
 	//s.discoveryDocument.AuthorizationEndpoint = baseUrl + wellknown.AuthorizationPath
 	s.discoveryDocument.TokenEndpoint = baseUrl + wellknown.TokenPath
 	s.discoveryDocument.Issuer = baseUrl
+	s.discoveryDocument.UserinfoEndpoint = baseUrl + wellknown.UserInfoPath
+	s.discoveryDocument.IDTokenSigningAlgValuesSupported = []string{"ES256"}
+	s.discoveryDocument.GrantTypesSupported = []string{"authorization_code", "refresh_token"}
+	s.discoveryDocument.ResponseTypesSupported = []string{"code"}
 	return c.JSON(http.StatusOK, s.discoveryDocument)
 }

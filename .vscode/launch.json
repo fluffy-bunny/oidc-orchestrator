@@ -20,6 +20,15 @@
 
         },
         "args": [   ]        
+    },
+    {
+        "name": "clientapp",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/clientapp",
+        
+        "args": [   ]        
     }
 ]
 }
