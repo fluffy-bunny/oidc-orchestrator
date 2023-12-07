@@ -4,12 +4,12 @@ import "context"
 
 type (
 	DiscoveryDocument struct {
-		Issuer                            string   `json:"issuer"`
-		AuthorizationEndpoint             string   `json:"authorization_endpoint"`
-		DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint"`
-		TokenEndpoint                     string   `json:"token_endpoint"`
-		UserinfoEndpoint                  string   `json:"userinfo_endpoint"`
-		RevocationEndpoint                string   `json:"revocation_endpoint"`
+		Issuer                      string `json:"issuer"`
+		AuthorizationEndpoint       string `json:"authorization_endpoint"`
+		DeviceAuthorizationEndpoint string `json:"device_authorization_endpoint"`
+		TokenEndpoint               string `json:"token_endpoint"`
+		UserinfoEndpoint            string `json:"userinfo_endpoint"`
+		//RevocationEndpoint                string   `json:"revocation_endpoint"`
 		JwksURI                           string   `json:"jwks_uri"`
 		ResponseTypesSupported            []string `json:"response_types_supported"`
 		SubjectTypesSupported             []string `json:"subject_types_supported"`
