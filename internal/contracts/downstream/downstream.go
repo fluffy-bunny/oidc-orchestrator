@@ -1,5 +1,7 @@
 package downstream
 
+import "context"
+
 type (
 	DiscoveryDocument struct {
 		Issuer                            string   `json:"issuer"`
@@ -29,6 +31,6 @@ type (
 		// GetDiscoveryDocument ...
 		GetDiscoveryDocument() (*DiscoveryDocument, error)
 		GetJWKS() (interface{}, error)
-		ExchangeCodeForToken(basicAuth string, code string, redirectURL string) (*AuthorizationCodeResponse, error)
+		ExchangeCodeForToken(ctx context.Context, basicAuth string, code string, redirectURL string) (*AuthorizationCodeResponse, error)
 	}
 )

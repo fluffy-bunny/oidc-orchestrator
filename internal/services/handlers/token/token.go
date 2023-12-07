@@ -2,6 +2,7 @@ package token
 
 import (
 	"net/http"
+	"time"
 
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
 	contracts_handler "github.com/fluffy-bunny/fluffycore/echo/contracts/handler"
@@ -86,6 +87,8 @@ func (s *service) Do(c echo.Context) error {
 	return c.JSON(http.StatusBadRequest, "unsupported_grant_type")
 }
 
+
+
 func (s *service) handleAuthorizationCodeRequest(c echo.Context) error {
 	log := zerolog.Ctx(c.Request().Context()).With().Logger()
 	ctx := c.Request().Context()
@@ -101,7 +104,7 @@ func (s *service) handleAuthorizationCodeRequest(c echo.Context) error {
 	// pull the basic auth from the header
 	basicAuth := r.Header.Get("Authorization")
 
-	response, err := s.downstreamService.ExchangeCodeForToken(basicAuth, code, redirectURI)
+	response, err := s.downstreamService.ExchangeCodeForToken(ctx, basicAuth, code, redirectURI)
 	if err != nil {
 		log.Error().Err(err).Msg("ExchangeCodeForToken")
 		return c.JSON(http.StatusBadRequest, "could not exchange code for token")
@@ -121,6 +124,10 @@ func (s *service) handleAuthorizationCodeRequest(c echo.Context) error {
 		log.Error().Err(err).Msg("ExchangeCodeForToken")
 		return c.JSON(http.StatusBadRequest, "could not parse id_token")
 	}
+	iat := tokenMap["iat"].(time.Time)
+	exp := tokenMap["exp"].(time.Time)
+	tokenMap["iat"] = iat.Unix()
+	tokenMap["exp"] = exp.Unix() 
 	for k, v := range tokenMap {
 		claims.Set(k, v)
 	}

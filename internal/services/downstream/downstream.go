@@ -1,6 +1,7 @@
 package downstream
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,7 +9,7 @@ import (
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
 	contracts_config "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/config"
 	contracts_downstream "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/downstream"
-	resty "github.com/go-resty/resty/v2"
+	req "github.com/imroc/req/v3"
 	"github.com/rs/zerolog/log"
 )
 
@@ -30,17 +31,18 @@ func ctor(config *contracts_config.Config) (*service, error) {
 	discoveryUrlS := fmt.Sprintf("%s/.well-known/openid-configuration", config.DownStreamAuthority)
 
 	// pull the discovery from the authority
-	client := resty.New()
-	resp, err := client.R().Get(discoveryUrlS)
+	client := req.C()
+	resp, err := client.R(). // Use R() to create a request.
+					Get(discoveryUrlS)
 	if err != nil {
 		log.Error().Err(err).Msgf("ctor: %s", discoveryUrlS)
 		return nil, err
 	}
-	if resp.StatusCode() != http.StatusOK {
+	if resp.StatusCode != http.StatusOK {
 		log.Error().Err(err).Msgf("ctor: %s", discoveryUrlS)
 		return nil, err
 	}
-	body := resp.Body()
+	body := resp.Bytes()
 	log.Info().Msgf("ctor: %s", body)
 
 	discoveryDocument := &contracts_downstream.DiscoveryDocument{}
@@ -68,17 +70,17 @@ func (s *service) GetDiscoveryDocument() (*contracts_downstream.DiscoveryDocumen
 }
 func (s *service) GetJWKS() (interface{}, error) {
 	jwksUrl := s.discoveryDocument.JwksURI
-	client := resty.New()
+	client := req.C()
 	resp, err := client.R().Get(jwksUrl)
 	if err != nil {
 		log.Error().Err(err).Msgf("GetJWKS: %s", jwksUrl)
 		return nil, err
 	}
-	if resp.StatusCode() != http.StatusOK {
+	if resp.StatusCode != http.StatusOK {
 		log.Error().Err(err).Msgf("GetJWKS: %s", jwksUrl)
 		return nil, err
 	}
-	body := resp.Body()
+	body := resp.Bytes()
 	log.Info().Msgf("GetJWKS: %s", body)
 	var jwks interface{}
 	err = json.Unmarshal(body, &jwks)
@@ -88,9 +90,9 @@ func (s *service) GetJWKS() (interface{}, error) {
 	}
 	return jwks, nil
 }
-func (s *service) ExchangeCodeForToken(authToken string, code string, redirectURL string) (*contracts_downstream.AuthorizationCodeResponse, error) {
+func (s *service) ExchangeCodeForToken(ctx context.Context, authToken string, code string, redirectURL string) (*contracts_downstream.AuthorizationCodeResponse, error) {
 	// grant_type: authorization_code
-	client := resty.New()
+	client := req.C()
 
 	// build a form to post
 	form := map[string]string{
@@ -99,6 +101,7 @@ func (s *service) ExchangeCodeForToken(authToken string, code string, redirectUR
 		"redirect_uri": redirectURL,
 	}
 	resp, err := client.R().
+		SetContext(ctx).
 		SetHeader("Authorization", authToken).
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetHeader("Accept", "application/json").
@@ -109,11 +112,11 @@ func (s *service) ExchangeCodeForToken(authToken string, code string, redirectUR
 		log.Error().Err(err).Msgf("ExchangeCodeForToken: %s", s.discoveryDocument.TokenEndpoint)
 		return nil, err
 	}
-	if resp.StatusCode() != http.StatusOK {
+	if resp.StatusCode != http.StatusOK {
 		log.Error().Err(err).Msgf("ExchangeCodeForToken: %s", s.discoveryDocument.TokenEndpoint)
 		return nil, err
 	}
-	body := resp.Body()
+	body := resp.Bytes()
 	log.Info().Msgf("ExchangeCodeForToken: %s", body)
 	response := &contracts_downstream.AuthorizationCodeResponse{}
 	err = json.Unmarshal(body, response)

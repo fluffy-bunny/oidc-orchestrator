@@ -29,6 +29,35 @@
         "program": "${workspaceFolder}/cmd/clientapp",
         
         "args": [   ]        
+    },
+    {
+        "name": "clientapp-google",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/clientapp2",
+        "env": {
+            "PORT": "5556",
+            "GOOGLE_OAUTH2_CLIENT_ID": "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
+            "GOOGLE_OAUTH2_CLIENT_SECRET":"gOKwmN181CgsnQQDWqTSZjFs",
+            "AUTHORITY": "https://accounts.google.com",     
+        },
+        "args": [   ]        
+    },
+    {
+        "name": "clientapp-orchestrator",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/clientapp2",
+        "env": {
+            "PORT": "5556",
+            "GOOGLE_OAUTH2_CLIENT_ID": "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
+            "GOOGLE_OAUTH2_CLIENT_SECRET":"gOKwmN181CgsnQQDWqTSZjFs",
+            "AUTHORITY": "http://localhost:9044",     
+        },
+        "args": [   ]        
     }
+
 ]
 }
