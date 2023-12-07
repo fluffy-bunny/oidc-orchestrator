@@ -6,7 +6,7 @@ Why in hell would I do this?
 
 When you buy someones app and they claim "We support SSO integration", DO NOT BELIEVE THEM.  Its usually such a simplistic integration that it basically useless.  
 
-Mature client apps will let you do a [token exchange](https://oauth.net/2/token-exchange/) right after the SSO Login where the id_token is exchanged for an access_token that contains all the necessary claims for downstream api calls.  This is the way it should be done.  But, some apps are not mature enough to do this.  So, this orchestrator will take the id_token and exchange it for an access_token that contains all the necessary claims for downstream api calls.
+Mature client apps will let you do a [token exchange](https://oauth.net/2/token-exchange/) right after the SSO Login where the id_token is exchanged for an access_token that contains all the necessary claims for downstream api calls.  This is the way it should be done.   So, this orchestrator will take the id_token and exchange it for an access_token that contains all the necessary claims for downstream api calls.
 
 In this example I am orchestrating google.  In the end the client app doesn't get google id_tokens or access_tokens.  Those are exchanged in the OAuth2 CODE flow for newly minted access_tokens that contain the necessary claims for downstream api calls.  If you have an internal OAuth2 service that supports token exchange, like I do, you would make a call to that by passing google id_token and get back a new access_token and optionally a refresh_token.
 
