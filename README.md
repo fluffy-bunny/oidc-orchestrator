@@ -12,14 +12,27 @@ In this example I am orchestrating google.  In the end the client app doesn't ge
 
 So if your apps SSO integration is pointing to AzureAD, and we all know that the access_tokens we get from Azure are useless.  We can then point the app to our orchestrator that will produce the right tokens.  
 
+## OAuth2 Code Flow
+
 ```mermaid
 sequenceDiagram
-    ClientApp->>DownstreamServer: redirect /authorize
-    DownstreamServer->>ClientApp: redirect /callback
-    ClientApp->>Orchestrator: POST /token
-    Orchestrator->>DownstreamServer: POST /token
-    DownstreamServer-->>Orchestrator: TokenResponse
-    Orchestrator->>Orchestrator: Mint New Tokens
+
+    ClientApp->>Orchestrator: GET /.well-known/openid-configuration
+    Orchestrator->>IDP: GET /.well-known/openid-configuration
+    IDP-->>Orchestrator: Discovery Document
+    Orchestrator->>Orchestrator: modify discovery document
+    Orchestrator-->>ClientApp: Discovery Document
+    ClientApp->>IDP: redirect /authorize
+    IDP->>ClientApp: redirect /callback
+    ClientApp->>Orchestrator: POST /token (code)
+    Orchestrator->>IDP: POST /token (code)
+    activate IDP
+    IDP-->>Orchestrator: TokenResponse
+    deactivate  IDP
+    Orchestrator->>TokenExchange: /exchange (id_token)
+    activate TokenExchange
+    TokenExchange-->>Orchestrator: token(s)
+    deactivate  TokenExchange
     Orchestrator-->>ClientApp: TokenResponse
 ```
 
