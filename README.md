@@ -12,6 +12,17 @@ In this example I am orchestrating google.  In the end the client app doesn't ge
 
 So if your apps SSO integration is pointing to AzureAD, and we all know that the access_tokens we get from Azure are useless.  We can then point the app to our orchestrator that will produce the right tokens.  
 
+```mermaid
+sequenceDiagram
+    ClientApp->>DownstreamServer: redirect /authorize
+    DownstreamServer->>ClientApp: redirect /callback
+    ClientApp->>Orchestrator: POST /token
+    Orchestrator->>DownstreamServer: POST /token
+    DownstreamServer-->>Orchestrator: TokenResponse
+    Orchestrator->>Orchestrator: Mint New Tokens
+    Orchestrator-->>ClientApp: TokenResponse
+```
+
 ## Swagger
 
 [swag](https://github.com/swaggo/swag)  
@@ -29,18 +40,41 @@ This will generate a docs.go file in the cmd/server folder.
 
 ## Launch Server
 
+### Google Orchestrator
+
 ```powershell
 cd cmd/server
 go build .
 
-$env:PORT = "9044"; .\server.exe
+$env:PORT = "9044";$env:DOWN_STREAM_AUTHORITY = "https://accounts.google.com"; .\server.exe
 ```
 
-## Launch Client App
+### Azure EntraID (Azure AD) Orchestrator
 
 ```powershell
 cd cmd/clientapp
 go build .
 
-$env:PORT = "5556";$env:GOOGLE_OAUTH2_CLIENT_ID = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com";$env:GOOGLE_OAUTH2_CLIENT_SECRET = "**REDACTED**";$env:AUTHORITY = "http://localhost:9044"; .\clientapp.exe
+$env:PORT = "9044";$env:DOWN_STREAM_AUTHORITY = "https://login.microsoftonline.com/f3c3e0c3-ea9e-469c-aca8-3276a8b12d26/v2.0"; .\server.exe
 ```
+
+## Launch Client App
+
+### Google Client
+
+```powershell
+cd cmd/clientapp
+go build .
+
+$env:PORT = "5556";$env:OAUTH2_CLIENT_ID = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com";$env:OAUTH2_CLIENT_SECRET = "**REDACTED**";$env:AUTHORITY = "http://localhost:9044"; .\clientapp.exe
+```
+
+### Azure EntraID (Azure AD) Client
+
+```powershell
+cd cmd/clientapp
+go build .
+
+$env:PORT = "5556";$env:OAUTH2_CLIENT_ID = "fe794e91-40ef-430e-9aa5-29e3ca962928";$env:OAUTH2_CLIENT_SECRET = "**REDACTED**";$env:AUTHORITY = "http://localhost:9044"; .\clientapp.exe
+```
+

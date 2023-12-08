@@ -20,8 +20,8 @@ import (
 )
 
 var (
-	clientID     = os.Getenv("GOOGLE_OAUTH2_CLIENT_ID")
-	clientSecret = os.Getenv("GOOGLE_OAUTH2_CLIENT_SECRET")
+	clientID     = os.Getenv("OAUTH2_CLIENT_ID")
+	clientSecret = os.Getenv("OAUTH2_CLIENT_SECRET")
 	port         = os.Getenv("PORT")
 	authority    = os.Getenv("AUTHORITY")
 	callbackPath = "/auth/callback"

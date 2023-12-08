@@ -124,6 +124,11 @@ func (s *service) handleAuthorizationCodeRequest(c echo.Context) error {
 	}
 	iat := tokenMap["iat"].(time.Time)
 	exp := tokenMap["exp"].(time.Time)
+	_, ok := tokenMap["nbf"]
+	if ok {
+		nbf := tokenMap["nbf"].(time.Time)
+		tokenMap["nbf"] = nbf.Unix()
+	}
 	tokenMap["iat"] = iat.Unix()
 	tokenMap["exp"] = exp.Unix()
 	for k, v := range tokenMap {
