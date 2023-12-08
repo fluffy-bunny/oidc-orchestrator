@@ -16,6 +16,10 @@ So if your apps SSO integration is pointing to AzureAD, and we all know that the
 
 ```mermaid
 sequenceDiagram
+    participant ClientApp
+    participant Orchestrator as Orchestrator<br/>(Authority)
+    participant IDP as IDP<br/>(Azure EntraID)
+    participant TokenExchange
 
     ClientApp->>Orchestrator: GET /.well-known/openid-configuration
     Orchestrator->>IDP: GET /.well-known/openid-configuration
