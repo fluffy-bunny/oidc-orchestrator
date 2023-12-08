@@ -102,7 +102,6 @@ func (s *service) handleAuthorizationCodeRequest(c echo.Context) error {
 	// pull the basic auth from the header
 	basicAuth := r.Header.Get("Authorization")
 	log.Info().Msgf("calling ExchangeCodeForToken")
-
 	response, err := s.downstreamService.ExchangeCodeForToken(context.Background(), basicAuth, code, redirectURI)
 	if err != nil {
 		log.Error().Err(err).Msg("ExchangeCodeForToken")

@@ -42,5 +42,5 @@ $env:PORT = "9044"; .\server.exe
 cd cmd/clientapp
 go build .
 
-$env:PORT = "5556";$env:GOOGLE_OAUTH2_CLIENT_ID = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com";$env:GOOGLE_OAUTH2_CLIENT_SECRET = "gOKwmN181CgsnQQDWqTSZjFs";$env:AUTHORITY = "http://localhost:9044"; .\clientapp.exe
+$env:PORT = "5556";$env:GOOGLE_OAUTH2_CLIENT_ID = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com";$env:GOOGLE_OAUTH2_CLIENT_SECRET = "**REDACTED**";$env:AUTHORITY = "http://localhost:9044"; .\clientapp.exe
 ```

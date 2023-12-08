@@ -66,7 +66,10 @@ func AddSingletonIDownstreamOIDCService(builder di.ContainerBuilder) {
 	di.AddSingleton[contracts_downstream.IDownstreamOIDCService](builder, ctor)
 }
 func (s *service) GetDiscoveryDocument() (*contracts_downstream.DiscoveryDocument, error) {
-	return s.discoveryDocument, nil
+	// make a copy of the discovery document
+	copy := &contracts_downstream.DiscoveryDocument{}
+	*copy = *s.discoveryDocument
+	return copy, nil
 }
 func (s *service) GetJWKS() (interface{}, error) {
 	jwksUrl := s.discoveryDocument.JwksURI
@@ -90,7 +93,18 @@ func (s *service) GetJWKS() (interface{}, error) {
 	}
 	return jwks, nil
 }
-func (s *service) ExchangeCodeForToken(ctx context.Context, authToken string, code string, redirectURL string) (*contracts_downstream.AuthorizationCodeResponse, error) {
+
+var mockIDToken = `eyJhbGciOiJFUzI1NiIsImtpZCI6IjBiMmNkMmU1NGM5MjRjZTg5ZjAxMGYyNDI4NjIzNjdkIiwidHlwIjoiSldUIn0.eyJhdWQiOiJteWF1ZCIsImVtYWlsIjoiZ2hzdGFobEBnbWFpbC5jb20iLCJleHAiOjE3MDE5Njg5MDgsImZhbWlseV9uYW1lIjoiU3RhaGwiLCJnaXZlbl9uYW1lIjoiSGVyYiIsImlhdCI6MTcwMTk2NzEwOCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo5MDQ0IiwibmFtZSI6IkhlcmIgU3RhaGwiLCJwZXJtaXNzaW9ucyI6WyJwZXJtaXNzaW9uLm9uZSIsInBlcm1pc3Npb24udHdvIiwicGVybWlzc2lvbi50aHJlZSJdLCJzdWIiOiIxMDQ3NTg5MjQ0MjgwMzY2NjM5NTEifQ.NMo1-LmNUZBDf55uRjOgmS7pyZXMvxehfPScReswRVhIDm3ONUU-25cGpn6Vwbha2Jq62x2BMnviW4gH-UkD0A`
+
+func (s *service) ExchangeCodeForToken(ctx context.Context,
+	authToken string, code string, redirectURL string) (*contracts_downstream.AuthorizationCodeResponse, error) {
+	/*
+			return &contracts_downstream.AuthorizationCodeResponse{
+			AccessToken: mockIDToken,
+			IDToken:     mockIDToken,
+		}, nil
+	*/
+
 	// grant_type: authorization_code
 	client := req.C()
 
