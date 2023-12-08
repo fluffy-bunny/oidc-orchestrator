@@ -4,7 +4,7 @@ import (
 	"context"
 
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
-	contracts_probe "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/contracts/probe"
+	contracts_probe "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/probe"
 	zerolog "github.com/rs/zerolog"
 )
 

@@ -1,16 +1,21 @@
-package healthz
+package home
 
 import (
 	"net/http"
 
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
 	contracts_handler "github.com/fluffy-bunny/fluffycore/echo/contracts/handler"
+	contracts_config "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/config"
+	contracts_downstream "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/downstream"
 	wellknown "github.com/fluffy-bunny/oidc-orchestrator/internal/wellknown"
 	echo "github.com/labstack/echo/v4"
 )
 
 type (
-	service struct{}
+	service struct {
+		config            *contracts_config.Config
+		downstreamService contracts_downstream.IDownstreamOIDCService
+	}
 )
 
 func init() {
@@ -24,25 +29,20 @@ func AddScopedIHandler(builder di.ContainerBuilder) {
 		[]contracts_handler.HTTPVERB{
 			contracts_handler.GET,
 		},
-		wellknown.HealthzPath,
+		wellknown.HomePath,
 	)
 
 }
-func ctor() (*service, error) {
-	return &service{}, nil
+func ctor(config *contracts_config.Config) (*service, error) {
+	return &service{
+		config: config,
+	}, nil
 }
 func (s *service) GetMiddleware() []echo.MiddlewareFunc {
 	return []echo.MiddlewareFunc{}
 }
 
-// HealthCheck godoc
-// @Summary Show the status of server.
-// @Description get the status of server.
-// @Tags root
-// @Accept */*
-// @Produce json
-// @Success 200 {object} string
-// @Router /healthz [get]
 func (s *service) Do(c echo.Context) error {
-	return c.JSON(http.StatusOK, "ok")
+	// redirect temporarily to swagger
+	return c.Redirect(http.StatusFound, "/swagger/")
 }

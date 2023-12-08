@@ -9,6 +9,8 @@ type (
 		PrettyLog              bool   `json:"prettyLog" mapstructure:"PRETTY_LOG"`
 		LogLevel               string `json:"logLevel" mapstructure:"LOG_LEVEL"`
 		Port                   int    `json:"port" mapstructure:"PORT"`
+		DownStreamAuthority    string `json:"downStreamAuthority" mapstructure:"DOWN_STREAM_AUTHORITY"`
+		AuthorizedRedirectUrl  string `json:"authorizedRedirectUrl" mapstructure:"AUTHORIZED_REDIRECT_URL"`
 	}
 )
 
@@ -21,7 +23,9 @@ var (
 	"APPLICATION_ENVIRONMENT": "in-environment",
 	"PRETTY_LOG": false,
 	"LOG_LEVEL": "info",
-	"PORT": 1111
+	"PORT": 1111,
+	"DOWN_STREAM_AUTHORITY": "https://accounts.google.com",
+ 	"AUTHORIZED_REDIRECT_URL": "http://localhost:2222/signin-google"
 }
 `)
 )

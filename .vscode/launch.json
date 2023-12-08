@@ -9,15 +9,46 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/server",
+         
         "env": {
             "APPLICATION_NAME": "example",
             "APPLICATION_ENVIRONMENT":"Development",
             "LOG_LEVEL": "debug",     
             "PRETTY_LOG":"true",
             "PORT": "9044",
+             "AUTHORIZED_REDIRECT_URL":"http://localhost:5556/auth/callback",
 
         },
         "args": [   ]        
+    },
+    {
+        "name": "clientapp-google",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/clientapp",
+        "env": {
+            "PORT": "5556",
+            "GOOGLE_OAUTH2_CLIENT_ID": "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
+            "GOOGLE_OAUTH2_CLIENT_SECRET":"**REDACTED**",
+            "AUTHORITY": "https://accounts.google.com",     
+        },
+        "args": [   ]        
+    },
+    {
+        "name": "clientapp-orchestrator",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/clientapp",
+        "env": {
+            "PORT": "5556",
+            "GOOGLE_OAUTH2_CLIENT_ID": "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
+            "GOOGLE_OAUTH2_CLIENT_SECRET":"**REDACTED**",
+            "AUTHORITY": "http://localhost:9044",     
+        },
+        "args": [   ]        
     }
+
 ]
 }

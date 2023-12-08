@@ -1,8 +1,13 @@
 package wellknown
 
 const (
-	HomePath    = "/"
-	SwaggerPath = "/swagger/*"
-	HealthzPath = "/healthz"
-	ReadyPath   = "/ready"
+	HomePath         = "/"
+	SwaggerPath      = "/swagger/*"
+	HealthzPath      = "/healthz"
+	ReadyPath        = "/ready"
+	DiscoveryPath    = "/.well-known/openid-configuration"
+	JWKSPath         = "/.well-known/jwks"
+	TokenPath        = "/token"
+	SigninGooglePath = "/signin-google"
+	UserInfoPath     = "/userinfo"
 )

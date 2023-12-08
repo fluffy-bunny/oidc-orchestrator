@@ -1,18 +1,97 @@
 basePath: /
+definitions:
+  downstream.DiscoveryDocument:
+    properties:
+      authorization_endpoint:
+        type: string
+      claims_supported:
+        items:
+          type: string
+        type: array
+      code_challenge_methods_supported:
+        items:
+          type: string
+        type: array
+      device_authorization_endpoint:
+        type: string
+      grant_types_supported:
+        items:
+          type: string
+        type: array
+      id_token_signing_alg_values_supported:
+        items:
+          type: string
+        type: array
+      issuer:
+        type: string
+      jwks_uri:
+        description: RevocationEndpoint                string   `json:"revocation_endpoint"`
+        type: string
+      response_types_supported:
+        items:
+          type: string
+        type: array
+      scopes_supported:
+        items:
+          type: string
+        type: array
+      subject_types_supported:
+        items:
+          type: string
+        type: array
+      token_endpoint:
+        type: string
+      token_endpoint_auth_methods_supported:
+        items:
+          type: string
+        type: array
+      userinfo_endpoint:
+        type: string
+    type: object
 host: localhost:9044
 info:
   contact:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server Petstore server.
+  description: Orchestrates a login to a downstream IDP.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+  title: OIDC Orchestrator API
   version: "1.0"
 paths:
+  /.well-known/jwks:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+      summary: Show the status of server.
+      tags:
+      - root
+  /.well-known/openid-configuration:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/downstream.DiscoveryDocument'
+      summary: Show the status of server.
+      tags:
+      - root
   /healthz:
     get:
       consumes:
@@ -25,6 +104,21 @@ paths:
           description: OK
           schema:
             type: string
+      summary: Show the status of server.
+      tags:
+      - root
+  /token:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
       summary: Show the status of server.
       tags:
       - root

@@ -2,13 +2,19 @@ package startup
 
 import (
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
-	contracts_config "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/contracts/config"
-	services_handlers_healthz "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/services/handlers/healthz"
-	services_handlers_swagger "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/services/handlers/swagger"
-	services_probe_database "github.com/fluffy-bunny/fluffycore-starterkit-echo/internal/services/probes/database"
 	fluffycore_contracts_runtime "github.com/fluffy-bunny/fluffycore/contracts/runtime"
 	contracts_startup "github.com/fluffy-bunny/fluffycore/echo/contracts/startup"
 	services_startup "github.com/fluffy-bunny/fluffycore/echo/services/startup"
+	contracts_config "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/config"
+	services_downstream "github.com/fluffy-bunny/oidc-orchestrator/internal/services/downstream"
+	services_handlers_discovery "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/discovery"
+	services_handlers_healthz "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/healthz"
+	services_handlers_home "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/home"
+	services_handlers_jwks "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/jwks"
+	services_handlers_swagger "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/swagger"
+	services_handlers_token "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/token"
+	services_handlers_userinfo "github.com/fluffy-bunny/oidc-orchestrator/internal/services/handlers/userinfo"
+	services_probe_database "github.com/fluffy-bunny/oidc-orchestrator/internal/services/probes/database"
 	echo "github.com/labstack/echo/v4"
 	log "github.com/rs/zerolog/log"
 )
@@ -50,7 +56,9 @@ func (s *startup) ConfigureServices(builder di.ContainerBuilder) error {
 		Port: s.config.Port,
 	})
 	services_probe_database.AddSingletonIProbe(builder)
+	services_downstream.AddSingletonIDownstreamOIDCService(builder)
 	s.addAppHandlers(builder)
+	di.AddInstance[*contracts_config.Config](builder, s.config)
 	return nil
 }
 
@@ -68,6 +76,11 @@ func (s *startup) PreShutdownHook(echo *echo.Echo) error {
 }
 func (s *startup) addAppHandlers(builder di.ContainerBuilder) {
 	// add your handlers here
+	services_handlers_home.AddScopedIHandler(builder)
 	services_handlers_healthz.AddScopedIHandler(builder)
 	services_handlers_swagger.AddScopedIHandler(builder)
+	services_handlers_discovery.AddScopedIHandler(builder)
+	services_handlers_jwks.AddScopedIHandler(builder)
+	services_handlers_token.AddScopedIHandler(builder)
+	services_handlers_userinfo.AddScopedIHandler(builder)
 }
