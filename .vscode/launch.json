@@ -16,8 +16,6 @@
             "LOG_LEVEL": "debug",     
             "PRETTY_LOG":"true",
             "PORT": "9044",
-             "AUTHORIZED_REDIRECT_URL":"http://localhost:5556/auth/callback",
-
         },
         "args": [   ]        
     },
