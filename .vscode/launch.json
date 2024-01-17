@@ -46,6 +46,20 @@
             "AUTHORITY": "http://localhost:9044",     
         },
         "args": [   ]        
+    },
+    {
+        "name": "clientapp-authentik",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/clientapp",
+        "env": {
+            "PORT": "5556",
+            "OAUTH2_CLIENT_ID": "wzjjZh7MxuKIAVfaiXOLZBu8EnZa8QNpaFPBkcp2",
+            "OAUTH2_CLIENT_SECRET":"nChoNsCZWdipbYMfMBfSzJh9ynKcbFtoaEIltUhHfdi2JkV1qDjmM0KQQRLIR6sCVmsdLyiTFbfrCqatP0zkfTmgfsiRuMxLVMN7X28CB64bdtRhIwxACrp9sm3vC2ZB",
+            "AUTHORITY": "https://authentik.localhost.dev/application/o/app/",     
+        },
+        "args": [   ]        
     }
 
 ]
