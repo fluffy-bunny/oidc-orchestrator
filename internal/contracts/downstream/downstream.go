@@ -21,11 +21,12 @@ type (
 		GrantTypesSupported               []string `json:"grant_types_supported"`
 	}
 	AuthorizationCodeResponse struct {
-		AccessToken string `json:"access_token"`
-		ExpiresIn   int    `json:"expires_in"`
-		IDToken     string `json:"id_token"`
-		Scope       string `json:"scope"`
-		TokenType   string `json:"token_type"`
+		AccessToken  string `json:"access_token"`
+		ExpiresIn    int    `json:"expires_in"`
+		IDToken      string `json:"id_token"`
+		Scope        string `json:"scope"`
+		TokenType    string `json:"token_type"`
+		RefreshToken string `json:"refresh_token"`
 	}
 	IDownstreamOIDCService interface {
 		// GetDiscoveryDocument ...
