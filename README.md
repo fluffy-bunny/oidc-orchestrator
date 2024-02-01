@@ -19,6 +19,7 @@ sequenceDiagram
     participant ClientApp
     participant Orchestrator as Orchestrator<br/>(Authority)
     participant IDP as IDP<br/>(Azure EntraID)
+    participant TokenExchange
 
     ClientApp->>Orchestrator: GET /.well-known/openid-configuration
     Orchestrator->>IDP: GET /.well-known/openid-configuration
@@ -46,8 +47,7 @@ sequenceDiagram
     participant ClientApp
     participant Orchestrator as Orchestrator<br/>(Authority)
     participant IDP as IDP<br/>(Azure EntraID)
-    participant TokenExchange
-
+ 
     ClientApp->>Orchestrator: POST /oauth2/token  refresh_token
     note right of Orchestrator: refresh_token has the downstream refresh_token and orchestrator hints encoded.
     Orchestrator->>Orchestrator: decode refresh_token
