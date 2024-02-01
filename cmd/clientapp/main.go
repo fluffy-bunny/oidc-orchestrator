@@ -11,20 +11,23 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
-	"github.com/coreos/go-oidc/v3/oidc"
+	oidc "github.com/coreos/go-oidc/v3/oidc"
+	req "github.com/imroc/req/v3"
 	zerolog "github.com/rs/zerolog"
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2"
+	oauth2 "golang.org/x/oauth2"
 )
 
 var (
-	clientID     = os.Getenv("OAUTH2_CLIENT_ID")
-	clientSecret = os.Getenv("OAUTH2_CLIENT_SECRET")
-	port         = os.Getenv("PORT")
-	authority    = os.Getenv("AUTHORITY")
-	callbackPath = "/auth/callback"
+	clientID         = os.Getenv("OAUTH2_CLIENT_ID")
+	clientSecret     = os.Getenv("OAUTH2_CLIENT_SECRET")
+	port             = os.Getenv("PORT")
+	authority        = os.Getenv("AUTHORITY")
+	callbackPath     = "/auth/callback"
+	additionalScopes = os.Getenv("ADDITIONAL_SCOPES")
 )
 
 func randString(nByte int) (string, error) {
@@ -59,17 +62,24 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to query provider.")
 	}
+	tokenUrl := provider.Endpoint().TokenURL
+
 	oidcConfig := &oidc.Config{
 		ClientID: clientID,
 	}
 	verifier := provider.Verifier(oidcConfig)
 
+	basicScopes := []string{oidc.ScopeOpenID, "profile", "email"}
+	if additionalScopes != "" {
+		parts := strings.Split(additionalScopes, ",")
+		basicScopes = append(basicScopes, parts...)
+	}
 	config := oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Endpoint:     provider.Endpoint(),
 		RedirectURL:  fmt.Sprintf("http://localhost:%s%s", port, callbackPath),
-		Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
+		Scopes:       basicScopes,
 	}
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
@@ -127,6 +137,20 @@ func main() {
 		}
 
 		//oauth2Token.AccessToken = "*REDACTED*"
+
+		reqClient := req.C()
+		resp2, err := reqClient.R().
+			SetBasicAuth(clientID, clientSecret).
+			SetFormData(map[string]string{
+				"grant_type":    "refresh_token",
+				"refresh_token": oauth2Token.RefreshToken,
+			}).Post(tokenUrl)
+		if err != nil {
+			log.Fatal().Err(err).Msg("")
+		}
+		generic := make(map[string]interface{})
+		err = json.Unmarshal(resp2.Bytes(), &generic)
+		log.Info().Interface("generic", generic).Msg("")
 
 		resp := struct {
 			OAuth2Token   *oauth2.Token
