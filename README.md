@@ -19,7 +19,6 @@ sequenceDiagram
     participant ClientApp
     participant Orchestrator as Orchestrator<br/>(Authority)
     participant IDP as IDP<br/>(Azure EntraID)
-    participant TokenExchange
 
     ClientApp->>Orchestrator: GET /.well-known/openid-configuration
     Orchestrator->>IDP: GET /.well-known/openid-configuration
@@ -40,6 +39,26 @@ sequenceDiagram
     Orchestrator-->>ClientApp: TokenResponse
 ```
 
+## OAuth2 refresh_token flow
+
+```mermaid
+sequenceDiagram
+    participant ClientApp
+    participant Orchestrator as Orchestrator<br/>(Authority)
+    participant IDP as IDP<br/>(Azure EntraID)
+    participant TokenExchange
+
+    ClientApp->>Orchestrator: POST /oauth2/token  refresh_token
+    note right of Orchestrator: refresh_token has the downstream refresh_token and orchestrator hints encoded.
+    Orchestrator->>Orchestrator: decode refresh_token
+    Orchestrator->>IDP: POST /oauth2/token  downstream.refresh_token
+    IDP-->>Orchestrator: response
+    Orchestrator->>Orchestrator: mint new access_token
+    Orchestrator->>Orchestrator: mint new refresh_token(downstream.refresh_token + hints)
+    Orchestrator->>Orchestrator: Build response (orchestrator.refresh_token, orchestrator.access_token, etc)
+
+    Orchestrator-->>ClientApp: refresh_token response
+```
 ## Swagger
 
 [swag](https://github.com/swaggo/swag)  
