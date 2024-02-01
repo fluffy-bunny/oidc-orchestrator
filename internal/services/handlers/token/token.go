@@ -1,7 +1,6 @@
 package token
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -9,11 +8,11 @@ import (
 	di "github.com/fluffy-bunny/fluffy-dozm-di"
 	contracts_handler "github.com/fluffy-bunny/fluffycore/echo/contracts/handler"
 	mocks_oauth2 "github.com/fluffy-bunny/fluffycore/mocks/oauth2"
+	core_utils "github.com/fluffy-bunny/fluffycore/utils"
 	contracts_config "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/config"
 	contracts_downstream "github.com/fluffy-bunny/oidc-orchestrator/internal/contracts/downstream"
 	wellknown "github.com/fluffy-bunny/oidc-orchestrator/internal/wellknown"
 	echo "github.com/labstack/echo/v4"
-	jwxt "github.com/lestrrat-go/jwx/v2/jwt"
 	zerolog "github.com/rs/zerolog"
 )
 
@@ -85,83 +84,70 @@ func (s *service) Do(c echo.Context) error {
 	switch grantType {
 	case "authorization_code":
 		return s.handleAuthorizationCodeRequest(c)
+	case "refresh_token":
+		return s.handleRefreshTokenRequest(c)
 	}
 	log.Error().Msgf("grant_type: %s", grantType)
 	return c.JSON(http.StatusBadRequest, "unsupported_grant_type")
 }
+func (s *service) handleRefreshTokenRequest(c echo.Context) error {
+	// 1. Pull the wrapped downstream token and use it against the downstream token endpoint.
+	// 2. If successfull, create our access_token
+	// 2.1 If the refresh token is valid, create a new wrapped refresh_token
+	// 3. Return the access_token and refresh_token
 
-func (s *service) handleAuthorizationCodeRequest(c echo.Context) error {
-	log := zerolog.Ctx(c.Request().Context()).With().Logger()
 	ctx := c.Request().Context()
-	r := c.Request()
-	baseUrl := "http://" + c.Request().Host
 
-	redirectURI := r.Form.Get("redirect_uri")
-	code := r.Form.Get("code")
+	log := zerolog.Ctx(ctx).With().Logger()
+	r := c.Request()
+	baseUrl := "http://" + r.Host
+
+	refreshToken := r.Form.Get("refresh_token")
+	if core_utils.IsEmptyOrNil(refreshToken) {
+		return c.JSON(http.StatusBadRequest, "refresh_token is missing")
+	}
+	scope := r.Form.Get("scope")
+
+	log = log.With().Str("refreshToken", refreshToken).Logger()
+	claims, err := mocks_oauth2.ValidateToken(ctx, refreshToken)
+	if err != nil {
+		log.Error().Err(err).Msg("handleRefreshTokenRequest")
+		return c.JSON(http.StatusBadRequest, "bad refresh_token")
+	}
+	drt := claims.Get("downstream_refresh_token").(string)
+	baseAccessToken := claims.Get("base_access_token").(mocks_oauth2.IClaims)
 
 	// pull the basic auth from the header
 	basicAuth := r.Header.Get("Authorization")
-	log.Info().Msgf("calling ExchangeCodeForToken")
-	response, err := s.downstreamService.ExchangeCodeForToken(context.Background(), basicAuth, code, redirectURI)
+	request := &contracts_downstream.RefreshTokenRequest{
+		RefreshToken: drt,
+		Scope:        scope,
+	}
+	response, err := s.downstreamService.RefreshToken(ctx, basicAuth, request)
 	if err != nil {
-		log.Error().Err(err).Msg("ExchangeCodeForToken")
-		return c.JSON(http.StatusBadRequest, "could not exchange code for token")
+		log.Error().Err(err).Msg("handleRefreshTokenRequest")
+		return c.JSON(http.StatusBadRequest, "could not refresh token")
 	}
-	// crack open hte id_token
-	claims := mocks_oauth2.NewClaims()
-	notTrustedToken, err := jwxt.ParseString(response.IDToken,
-		jwxt.WithValidate(false),
-		jwxt.WithVerify(false))
+	// if we get here then the downstream token is good.  We don't care about anything it gave us back.
+	// we need to mint a new refresh token based upon the access_token we stored in our refresh_token
 
-	if err != nil {
-		log.Error().Err(err).Msg("ExchangeCodeForToken")
-		return c.JSON(http.StatusBadRequest, "could not parse id_token")
-	}
-	tokenMap, err := notTrustedToken.AsMap(ctx)
-	if err != nil {
-		log.Error().Err(err).Msg("ExchangeCodeForToken")
-		return c.JSON(http.StatusBadRequest, "could not parse id_token")
-	}
-	iat := tokenMap["iat"].(time.Time)
-	exp := tokenMap["exp"].(time.Time)
-	_, ok := tokenMap["nbf"]
-	if ok {
-		nbf := tokenMap["nbf"].(time.Time)
-		tokenMap["nbf"] = nbf.Unix()
-	}
-	tokenMap["iat"] = iat.Unix()
-	tokenMap["exp"] = exp.Unix()
-	for k, v := range tokenMap {
-		claims.Set(k, v)
-	}
-	claims.Set("iss", baseUrl)
-
-	log.Info().Interface("claims", claims).Msg("ExchangeCodeForToken")
-	myIdToken, _ := mocks_oauth2.MintToken(claims)
-	response.IDToken = myIdToken
-
-	// build out the access_token
-	// here we transfer over some minimal claims so that we just echo them back in our user_info api
-	// this is also where you would do a token exchange and get the full claims of what the user needs.
-	claims = mocks_oauth2.NewClaims()
-	claims.Set("iss", baseUrl)
-	claims.Set("sub", tokenMap["sub"])
-	claims.Set("email", tokenMap["email"])
-	claims.Set("family_name", tokenMap["family_name"])
-	claims.Set("given_name", tokenMap["given_name"])
-	claims.Set("name", tokenMap["name"])
-	claims.Set("aud", "myaud")
-	claims.Set("permissions", []string{
-		"permission.one",
-		"permission.two",
-		"permission.three",
-	})
 	now := time.Now()
-	claims.Set("exp", now.Add(time.Minute*30).Unix())
-	claims.Set("iat", now.Unix())
-	myAccessToken, _ := mocks_oauth2.MintToken(claims)
+	myNewAccessToken := mocks_oauth2.NewClaims()
+	for k, v := range baseAccessToken.Claims() {
+		myNewAccessToken.Set(k, v)
+	}
+	myNewAccessToken.Set("exp", now.Add(time.Minute*30).Unix())
+	myNewAccessToken.Set("iat", now.Unix())
+	myAccessToken, _ := mocks_oauth2.MintToken(myNewAccessToken)
 	response.AccessToken = myAccessToken
-	log.Info().Interface("response", response).Msg("ExchangeCodeForToken")
+
+	rtClaims := mocks_oauth2.NewClaims()
+	rtClaims.Set("iss", baseUrl)
+	rtClaims.Set("downstream_refresh_token", response.RefreshToken)
+	rtClaims.Set("base_access_token", baseAccessToken)
+	myRefreshToken, _ := mocks_oauth2.MintToken(rtClaims)
+	response.RefreshToken = myRefreshToken
+
 	return c.JSON(http.StatusOK, response)
 
 }

@@ -21,16 +21,28 @@ type (
 		GrantTypesSupported               []string `json:"grant_types_supported"`
 	}
 	AuthorizationCodeResponse struct {
-		AccessToken string `json:"access_token"`
-		ExpiresIn   int    `json:"expires_in"`
-		IDToken     string `json:"id_token"`
-		Scope       string `json:"scope"`
-		TokenType   string `json:"token_type"`
+		AccessToken  string `json:"access_token"`
+		ExpiresIn    int    `json:"expires_in"`
+		IDToken      string `json:"id_token,omitempty"`
+		Scope        string `json:"scope"`
+		TokenType    string `json:"token_type"`
+		RefreshToken string `json:"refresh_token,omitempty"`
+	}
+	RefreshTokenResponse struct {
+		AccessToken  string `json:"access_token"`
+		ExpiresIn    int    `json:"expires_in"`
+		TokenType    string `json:"token_type"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	RefreshTokenRequest struct {
+		RefreshToken string `json:"refresh_token"`
+		Scope        string `json:"scope"`
 	}
 	IDownstreamOIDCService interface {
 		// GetDiscoveryDocument ...
 		GetDiscoveryDocument() (*DiscoveryDocument, error)
 		GetJWKS() (interface{}, error)
 		ExchangeCodeForToken(ctx context.Context, basicAuth string, code string, redirectURL string) (*AuthorizationCodeResponse, error)
+		RefreshToken(ctx context.Context, basicAuth string, request *RefreshTokenRequest) (*RefreshTokenResponse, error)
 	}
 )
