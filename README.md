@@ -59,6 +59,7 @@ sequenceDiagram
 
     Orchestrator-->>ClientApp: refresh_token response
 ```
+
 ## Swagger
 
 [swag](https://github.com/swaggo/swag)  
@@ -88,7 +89,7 @@ $env:PORT = "9044";$env:DOWN_STREAM_AUTHORITY = "https://accounts.google.com"; .
 ### Azure EntraID (Azure AD) Orchestrator
 
 ```powershell
-cd cmd/clientapp
+cd cmd/server
 go build .
 
 $env:PORT = "9044";$env:DOWN_STREAM_AUTHORITY = "https://login.microsoftonline.com/f3c3e0c3-ea9e-469c-aca8-3276a8b12d26/v2.0"; .\server.exe
@@ -113,4 +114,3 @@ go build .
 
 $env:PORT = "5556";$env:OAUTH2_CLIENT_ID = "fe794e91-40ef-430e-9aa5-29e3ca962928";$env:OAUTH2_CLIENT_SECRET = "**REDACTED**";$env:AUTHORITY = "http://localhost:9044"; .\clientapp.exe
 ```
-
